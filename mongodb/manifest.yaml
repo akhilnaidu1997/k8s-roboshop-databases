@@ -1,0 +1,63 @@
+apiVersion: v1 
+kind: Service
+metadata:
+  name: mongodb-svc
+spec:
+  selector:
+    Project: roboshop
+    component: mongodb
+    tier: db
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: mongodb-headless
+spec:
+  clusterIP: None
+  selector:
+    Project: roboshop
+    component: mongodb
+    tier: db
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+spec:
+  selector:
+    matchLabels:
+      Project: roboshop
+      component: mongodb
+      tier: db
+  serviceName: "mongodb-headless"
+  replicas: 3 # by default is 1
+  template:
+    metadata:
+      labels:
+        Project: roboshop
+        component: mongodb
+        tier: db
+    spec:
+      containers:
+      - name: mongodb
+        image: akhilln/mongodb:v1
+        volumeMounts:
+        - name: www
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "ebs-sc"
+      resources:
+        requests:
+          storage: 1Gi
