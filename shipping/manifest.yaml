@@ -51,8 +51,8 @@ spec:
             memory: "64Mi"
             cpu: "100m"
           limits:
-            memory: "64Mi"
-            cpu: "100m"
+            memory: "500Mi"
+            cpu: "500m"
         envFrom:
         - configMapRef:
             name: shipping
