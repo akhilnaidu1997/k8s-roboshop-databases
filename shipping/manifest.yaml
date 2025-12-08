@@ -1,23 +1,23 @@
 apiVersion: v1 
 kind: ConfigMap
 metadata:
-  name: catalogue
+  name: shipping
   labels:
     Project: roboshop
-    component: catalogue
+    component: shipping
     tier: backend
   namespace: roboshop
 data:
-  MONGO: "true"
-  MONGO_URL: "mongodb://mongodb:27017/catalogue"
+  CART_ENDPOINT: "cart:8080"
+  DB_HOST: "mysql"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: catalogue
+  name: shipping
   labels:
     Project: roboshop
-    component: catalogue
+    component: shipping
     tier: backend
   namespace: roboshop
 spec:
@@ -31,18 +31,18 @@ spec:
   selector:
     matchLabels:
       Project: roboshop
-      component: catalogue
+      component: shipping
       tier: backend
   template:
     metadata:
       labels:
         Project: roboshop
-        component: catalogue
+        component: shipping
         tier: backend
     spec:
       containers:
-      - name: catalogue
-        image: akhilln/catalogue:v1
+      - name: shipping
+        image: akhilln/shipping:v1
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -55,7 +55,7 @@ spec:
             cpu: "100m"
         envFrom:
         - configMapRef:
-            name: catalogue
+            name: shipping
         readinessProbe:
           httpGet:
             path: /health
@@ -74,12 +74,12 @@ spec:
 apiVersion: v1 
 kind: Service
 metadata:
-  name: catalogue
+  name: shipping 
   namespace: roboshop
 spec:
   selector:
     Project: roboshop
-    component: catalogue
+    component: shipping
     tier: backend
   ports:
   - protocol: TCP
@@ -89,12 +89,12 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: catalogue-hpa
+  name: shipping-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: catalogue
+    name: shipping
   minReplicas: 1
   maxReplicas: 10
   metrics:
