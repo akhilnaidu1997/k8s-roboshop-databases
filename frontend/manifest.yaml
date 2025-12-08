@@ -103,17 +103,19 @@ spec:
         ports:
         - containerPort: 8080
         readinessProbe:
-          tcpSocket:
-            port: 80
+          httpGet:
+            path: /
+            port: 8080
           initialDelaySeconds: 10
-          periodSeconds: 10
           failureThreshold: 3
+          periodSeconds: 10
         livenessProbe:
-          tcpSocket:
-            port: 80
+          httpGet:
+            path: /
+            port: 8080
           initialDelaySeconds: 20
-          periodSeconds: 10
           failureThreshold: 3
+          periodSeconds: 10
         volumeMounts:
         - name: nginx-config
           mountPath: /etc/nginx/nginx.conf
